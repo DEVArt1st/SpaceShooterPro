@@ -18,6 +18,8 @@ public class Enemy : MonoBehaviour
     private AudioClip _explosionSoundClip;
     private AudioSource _audioSource;
 
+    private bool _isShootingActive = true;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -81,6 +83,7 @@ public class Enemy : MonoBehaviour
             _audioSource.Play();
             _speed = 0;
             Destroy(this.gameObject, 2.8f);
+            _isShootingActive = false;
         }
 
         if (other.tag == "Laser")
@@ -90,7 +93,7 @@ public class Enemy : MonoBehaviour
             _audioSource.Play();
             _speed = 0;
             Destroy(this.gameObject, 2.8f);
-            
+
 
             if (_player != null)
             {
@@ -99,6 +102,7 @@ public class Enemy : MonoBehaviour
 
             Destroy(GetComponent<Collider2D>());
             Destroy(other.gameObject);
+            _isShootingActive = false;
         }
 
     }
@@ -108,13 +112,15 @@ public class Enemy : MonoBehaviour
         _fireRate = Random.Range(3f, 7f);
         _canFire = Time.time + _fireRate;
 
-        GameObject enemyLaser = Instantiate(_laserPrefab, transform.position + new Vector3(0, -3.1f, 0), Quaternion.identity);
-        Laser[] lasers = enemyLaser.gameObject.GetComponentsInChildren<Laser>();
-
-        for (int i = 0; i < lasers.Length; i++)
+        if (_isShootingActive == true)
         {
-            lasers[i].AssignEnemyLaser();
-        }
+            GameObject enemyLaser = Instantiate(_laserPrefab, transform.position, Quaternion.identity);
+            Laser[] lasers = enemyLaser.gameObject.GetComponentsInChildren<Laser>();
 
+            for (int i = 0; i < lasers.Length; i++)
+            {
+                lasers[i].AssignEnemyLaser();
+            }
+        }
     }
 }

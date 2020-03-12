@@ -7,8 +7,11 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float _speed = 3.5f;
     private float _speedMultiplier = 2;
+    private float _thrusterMultiplier = 1.5f;
     [SerializeField]
     private GameObject _laserPrefab;
+    [SerializeField]
+    private GameObject _misslePrefab;
     [SerializeField]
     private GameObject _tripleShotPrefab;
     [SerializeField]
@@ -16,18 +19,24 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject _leftEnginePrefab;
     [SerializeField]
-    private float _fireRate = 0.5f;
+    private float _fireRate = 1.0f;
     private float _canFire = -1f;
     [SerializeField]
     private int _lives = 3;
+    [SerializeField]
+    private int _shieldLives = 0;
     private SpawnManager _spawnManager;
 
     private bool _isTripleShotActive = false;
     private bool _isSpeedBoostActive = false;
     private bool _isShieldActive = false;
+    private bool _isMissleActive = false;
+    private bool _laserFire = true;
 
     [SerializeField]
     private int _score;
+    [SerializeField]
+    private int _ammo;
 
     [SerializeField]
     private GameObject _shieldVisualizer;
@@ -75,6 +84,7 @@ public class Player : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space) && Time.time > _canFire)
         {
             FireLaser();
+            FireMissile();
         }
     }
 
@@ -88,7 +98,7 @@ public class Player : MonoBehaviour
 
         transform.Translate(direction * _speed * Time.deltaTime);
 
-        
+
 
         transform.position = new Vector3(transform.position.x, Mathf.Clamp(transform.position.y, -3.8f, 0));
 
@@ -100,34 +110,82 @@ public class Player : MonoBehaviour
         {
             transform.position = new Vector3(11.3f, transform.position.y, 0);
         }
+
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            _speed *= _thrusterMultiplier;
+        }
+        else if (Input.GetKeyUp(KeyCode.LeftShift))
+        {
+            _speed /= _thrusterMultiplier;
+        }
     }
 
     void FireLaser()
     {
         _canFire = Time.time + _fireRate;
 
-        if (_isTripleShotActive == true)
+        //Change these if and else statements to Switch Statements Later;
+        if (_laserFire == true)
         {
-            Instantiate(_tripleShotPrefab, transform.position, Quaternion.identity);
+            if (_isTripleShotActive == true)
+            {
+                Instantiate(_tripleShotPrefab, transform.position, Quaternion.identity);
+                _audioSource.Play();
+            }
+            else if (_ammo > 0)
+            {
+                Instantiate(_laserPrefab, transform.position + new Vector3(0, 1.0f, 0), Quaternion.identity);
+                _ammo = _ammo - 1;
+                _uiManager.UpdateAmmo(_ammo);
+                _audioSource.Play();
+            }
         }
-        else
-        {
-            Instantiate(_laserPrefab, transform.position + new Vector3(0, 2.3f, 0), Quaternion.identity);
-        }
+    }
 
-        _audioSource.Play();
+    //Missle Fire Method
+    public void FireMissile()
+    {
+        //if MissleShotIsActive
+        //instantiate at two custom random pos x:0.55f|-0.55f / y:-1.25f
+
+        if (_isMissleActive == true)
+        {
+            for (var i = 0; i < 1; i++)
+            {
+                float randomX = (Random.Range(0, 2) == 0) ? 0.55f : -0.55f;
+                Instantiate(_misslePrefab, transform.position + new Vector3(randomX, -1.25f, 0), Quaternion.identity);
+            }
+
+        }
     }
 
     public void Damage()
     {
         if (_isShieldActive == true)
         {
-            _isShieldActive = false;
-            _shieldVisualizer.SetActive(false);
+
+            _shieldLives -= 1;
+
+            if (_shieldLives == 2)
+            {
+                _shieldVisualizer.gameObject.GetComponent<SpriteRenderer>().color = Color.green;
+            }
+            else if (_shieldLives == 1)
+            {
+                _shieldVisualizer.gameObject.GetComponent<SpriteRenderer>().color = Color.red;
+            }
+            else
+            {
+                _isShieldActive = false;
+                _shieldVisualizer.SetActive(false);
+            }
+
             return;
         }
 
         _lives -= 1;
+        //Call Camera Shake Script
 
         if (_lives == 2)
         {
@@ -181,13 +239,57 @@ public class Player : MonoBehaviour
     public void ShieldActive()
     {
         _audioSource.PlayOneShot(_powerupSoundClip);
+        _shieldLives = 3;
         _isShieldActive = true;
         _shieldVisualizer.SetActive(true);
+        _shieldVisualizer.gameObject.GetComponent<SpriteRenderer>().color = Color.white;
     }
 
     public void AddScore(int points)
     {
         _score = _score + points;
         _uiManager.UpdateScore(_score);
+    }
+
+    public void AmmoCollected()
+    {
+        _audioSource.PlayOneShot(_powerupSoundClip);
+        _ammo = 15;
+        _uiManager.UpdateAmmo(_ammo);
+    }
+
+    public void HealthCollected()
+    {
+        _audioSource.PlayOneShot(_powerupSoundClip);
+        if (_lives < 3)
+        {
+            _lives += 1;
+        }
+
+        if (_lives == 2)
+        {
+            _leftEnginePrefab.SetActive(false);
+        }
+        else if (_lives == 3)
+        {
+            _leftEnginePrefab.SetActive(false);
+            _rightEnginePrefab.SetActive(false);
+        }
+        _uiManager.UpdateLives(_lives);
+    }
+
+    public void MissileShotActive()
+    {
+        _laserFire = false;
+        _isMissleActive = true;
+        _audioSource.PlayOneShot(_powerupSoundClip);
+        StartCoroutine(MissilePowerDownRoutine());
+    }
+
+    IEnumerator MissilePowerDownRoutine()
+    {
+        yield return new WaitForSeconds(5.0f);
+        _isMissleActive = false;
+        _laserFire = true;
     }
 }
