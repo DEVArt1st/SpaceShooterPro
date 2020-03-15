@@ -7,7 +7,6 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float _speed = 3.5f;
     private float _speedMultiplier = 2;
-    private float _thrusterMultiplier = 1.5f;
     [SerializeField]
     private GameObject _laserPrefab;
     [SerializeField]
@@ -26,17 +25,24 @@ public class Player : MonoBehaviour
     [SerializeField]
     private int _shieldLives = 0;
     private SpawnManager _spawnManager;
+    private CameraShake _camera;
 
     private bool _isTripleShotActive = false;
     private bool _isSpeedBoostActive = false;
     private bool _isShieldActive = false;
     private bool _isMissleActive = false;
     private bool _laserFire = true;
+    //Remove Laster (Maybe)
+    public bool _isThrustActive = false;
 
     [SerializeField]
     private int _score;
     [SerializeField]
     private int _ammo;
+    private float _maxThrust = 100f;
+    [SerializeField]
+    private float _currentThrust;
+    private Coroutine _regen;
 
     [SerializeField]
     private GameObject _shieldVisualizer;
@@ -56,6 +62,9 @@ public class Player : MonoBehaviour
         _spawnManager = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>();
         _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
         _audioSource = GetComponent<AudioSource>();
+        _camera = GameObject.Find("Main Camera").GetComponent<CameraShake>();
+
+        _currentThrust = _maxThrust;
 
         if (_spawnManager == null)
         {
@@ -65,6 +74,11 @@ public class Player : MonoBehaviour
         if (_uiManager == null)
         {
             Debug.LogError("The UIManager is NULL");
+        }
+
+        if (_camera == null)
+        {
+            Debug.LogError("The CameraShaker is NULL");
         }
 
         if (_audioSource == null)
@@ -111,14 +125,8 @@ public class Player : MonoBehaviour
             transform.position = new Vector3(11.3f, transform.position.y, 0);
         }
 
-        if (Input.GetKeyDown(KeyCode.LeftShift))
-        {
-            _speed *= _thrusterMultiplier;
-        }
-        else if (Input.GetKeyUp(KeyCode.LeftShift))
-        {
-            _speed /= _thrusterMultiplier;
-        }
+        SpeedBooster();
+
     }
 
     void FireLaser()
@@ -185,7 +193,7 @@ public class Player : MonoBehaviour
         }
 
         _lives -= 1;
-        //Call Camera Shake Script
+        _camera.TriggerShake();
 
         if (_lives == 2)
         {
@@ -291,5 +299,59 @@ public class Player : MonoBehaviour
         yield return new WaitForSeconds(5.0f);
         _isMissleActive = false;
         _laserFire = true;
+    }
+
+    void SpeedBooster()
+    {
+        if (Input.GetKeyDown(KeyCode.LeftShift) && _currentThrust > 0)
+        {
+            _speed += 5f;
+            _isThrustActive = true;
+
+            StartCoroutine(CurrentThrustSubtract());
+        }
+
+        else if (Input.GetKeyUp(KeyCode.LeftShift))
+        {
+            _isThrustActive = false;
+            _speed = 5f;
+
+            if (_regen != null)
+            {
+                StopCoroutine(_regen);
+            }
+
+            _regen = StartCoroutine(CurrentThrustRegen());
+        }
+    }
+
+    IEnumerator CurrentThrustSubtract()
+    {
+        while (_currentThrust > 0 && _isThrustActive == true)
+        {
+            yield return new WaitForSeconds(0.03f);
+            _currentThrust--;
+            _uiManager.UpdateThruster(_currentThrust);
+
+            if (_currentThrust == 0)
+            {
+                _isThrustActive = false;
+                _speed = 5f;
+            }
+        }
+    }
+
+    IEnumerator CurrentThrustRegen()
+    {
+
+        yield return new WaitForSeconds(3.5f);
+
+        while (_currentThrust < _maxThrust)
+        {
+                _currentThrust += _maxThrust / 100;
+                _uiManager.UpdateThruster(_currentThrust);
+                yield return new WaitForSeconds(0.01f);
+        }
+        _regen = null;
     }
 }
