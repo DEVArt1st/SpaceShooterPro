@@ -83,6 +83,8 @@ public class Enemy : MonoBehaviour
             _audioSource.Play();
             _speed = 0;
             Destroy(this.gameObject, 2.8f);
+            Destroy(GetComponent<Collider2D>());
+            Destroy(GetComponent<Rigidbody2D>());
             _isShootingActive = false;
         }
 
@@ -101,6 +103,7 @@ public class Enemy : MonoBehaviour
             }
 
             Destroy(GetComponent<Collider2D>());
+            Destroy(GetComponent<Rigidbody2D>());
             Destroy(other.gameObject);
             _isShootingActive = false;
         }
