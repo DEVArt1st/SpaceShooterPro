@@ -8,6 +8,24 @@ TagManager:
   - Laser
   - EnemyLaser
   - Missile
+  - Mine
+  - EnemyFOV
+  - Powerup
+  - Powerdown
+  - RightDetector
+  - LeftDetector
+  - SpaceshipTurrentCenter
+  - SpaceshipTurrentLeft
+  - SpaceshipTurrentRight
+  - LaserMK
+  - LaserMKTriple
+  - MK1LeftOne
+  - MK1LeftTwo
+  - MK1RightOne
+  - MK1RightTwo
+  - MK4Right
+  - MK4Left
+  - BossShipMainFrame
   layers:
   - Default
   - TransparentFX
@@ -18,7 +36,7 @@ TagManager:
   - 
   - 
   - Post Processing
-  - 
+  - FOV
   - 
   - 
   - 

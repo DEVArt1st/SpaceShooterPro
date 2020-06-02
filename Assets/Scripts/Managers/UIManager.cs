@@ -24,12 +24,10 @@ public class UIManager : MonoBehaviour
     private Text _thrustIndicator;
 
     private GameManager _gameManager;
-
-    // Start is called before the first frame update
     void Start()
     {
         _scoreText.text = "Score: " + 0;
-        _ammoCountText.text = "Ammo: " + 15;
+        _ammoCountText.text = "Ammo: " + 15 + "/15";
         _thrustIndicator.text = 100 + "%";
         _gameoverText.gameObject.SetActive(false);
         _gameManager = GameObject.Find("Game_Manager").GetComponent<GameManager>();
@@ -52,7 +50,7 @@ public class UIManager : MonoBehaviour
 
     public void UpdateAmmo(int playerAmmo)
     {
-        _ammoCountText.text = "Ammo: " + playerAmmo.ToString();
+        _ammoCountText.text = "Ammo: " + playerAmmo.ToString() + "/15";
     }
 
     public void GameOverTextFlicker()
