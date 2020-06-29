@@ -9,9 +9,7 @@ public class Enemy : MonoBehaviour
     [SerializeField]
     private float _speed = 4.0f;
     private float _canFire = 1f;
-    private float _fireRate = 3f;
-    private float _mineDeploymentRate = 3f;
-    private float _canDeployMine = 1f;
+    private float _fireRate = 3.0f;
     [SerializeField]
     private int _shieldLife;
     [SerializeField]
@@ -34,7 +32,6 @@ public class Enemy : MonoBehaviour
 
     private bool _isShootingActive = true;
     private bool _isShieldActive = false;
-    private bool _isMineGenerating;
 
     [SerializeField]
     private int _enemyID;
@@ -78,10 +75,6 @@ public class Enemy : MonoBehaviour
             EnemyLaserFire();
         }
 
-        if (Time.time > _canDeployMine)
-        {
-            EnemyMineDeployer();
-        }
     }
 
     private void Awake()
@@ -191,6 +184,7 @@ public class Enemy : MonoBehaviour
         _fireRate = Random.Range(3f, 7f);
         _canFire = Time.time + _fireRate;
 
+
         if (_isShootingActive == true)
         {
 
@@ -207,23 +201,16 @@ public class Enemy : MonoBehaviour
 
     void EnemyMineDeployer()
     {
-        _mineDeploymentRate = Random.Range(3f, 7f);
-        _canDeployMine = Time.time + _fireRate;
-
         _isShootingActive = false;
         StartCoroutine(MineDeployer());
     }
 
     IEnumerator MineDeployer()
     {
-        if (!_isMineGenerating)
-        {
-            yield return new WaitForSeconds(1f);
-            _isMineGenerating = true;
-            Instantiate(_mine, transform.position + new Vector3(0, 0, 0), Quaternion.identity);
-            yield return new WaitForSeconds(3.0f);
-            _isMineGenerating = false;
-        }
+        yield return new WaitForSeconds(1.5f);
+
+        Instantiate(_mine, transform.position + new Vector3(0, 0, 0), Quaternion.identity);
+        yield return new WaitForSeconds(6f);
     }
 
     void AggressiveEnemy()
