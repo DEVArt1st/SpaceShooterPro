@@ -35,7 +35,7 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         _scoreText.text = "Score: " + 0;
-        _ammoCountText.text = "Ammo: " + 15 + "/15";
+        _ammoCountText.text = "Ammo: " + 25 + "/25";
         _thrustIndicator.text = 100 + "%";
         _gameoverText.gameObject.SetActive(false);
         _gameManager = GameObject.Find("Game_Manager").GetComponent<GameManager>();
@@ -58,7 +58,7 @@ public class UIManager : MonoBehaviour
 
     public void UpdateAmmo(int playerAmmo)
     {
-        _ammoCountText.text = "Ammo: " + playerAmmo.ToString() + "/15";
+        _ammoCountText.text = "Ammo: " + playerAmmo.ToString() + "/25";
     }
 
     public void GameOverTextFlicker()

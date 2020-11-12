@@ -28,6 +28,7 @@ public class SpawnManager : MonoBehaviour
     private int _wave;
 
     private bool _bossHasSpawn = false;
+    private bool _bossHasBeenDefeated = false;
 
     public void StartSpawning()
     {
@@ -135,15 +136,7 @@ public class SpawnManager : MonoBehaviour
     {
         yield return new WaitForSeconds(6.0f);
 
-        while (_stopSpawning == false || _wave >= 10)
-        {
-            Vector3 posToSpawnPowerup = new Vector3(Random.Range(-8f, 8f), 7, 0);
-            int randomPowerUp = Random.Range(0, _commonPowerUps.Length);
-            Instantiate(_commonPowerUps[randomPowerUp], posToSpawnPowerup, Quaternion.identity);
-            yield return new WaitForSeconds(Random.Range(6, 10));
-        }
-
-        while (_wave >= 10)
+        while (_stopSpawning == false || _wave >= 10 && _bossHasBeenDefeated == false)
         {
             Vector3 posToSpawnPowerup = new Vector3(Random.Range(-8f, 8f), 7, 0);
             int randomPowerUp = Random.Range(0, _commonPowerUps.Length);
@@ -156,7 +149,7 @@ public class SpawnManager : MonoBehaviour
     {
         yield return new WaitForSeconds(35.0f);
 
-        while (_stopSpawning == false || _wave >= 10)
+        while (_stopSpawning == false || _wave >= 10 && _bossHasBeenDefeated == false)
         {
             Vector3 posToSpawnPowerup = new Vector3(Random.Range(-8f, 8f), 7, 0);
             int randomPowerUp = Random.Range(0, _rarePowerUps.Length);
@@ -168,7 +161,7 @@ public class SpawnManager : MonoBehaviour
     IEnumerator SpawnPowerupEpicRoutine()
     {
         yield return new WaitForSeconds(60.0f);
-        while (_stopSpawning == false || _wave >= 10)
+        while (_stopSpawning == false || _wave >= 10 && _bossHasBeenDefeated == false)
         {
             Vector3 posToSpawnPowerup = new Vector3(Random.Range(-8f, 8f), 7, 0);
             int randomRarePowerUp = Random.Range(0, _epicPowerUps.Length);
@@ -180,6 +173,11 @@ public class SpawnManager : MonoBehaviour
     public void OnPlayerDeath()
     {
         _stopSpawning = true;
+    }
+
+    public void BossDefeated()
+    {
+        _bossHasBeenDefeated = true;
     }
 
     public void OnBossDestroyed()

@@ -263,7 +263,7 @@ public class Player : MonoBehaviour
     public void AmmoCollected()
     {
         _audioSource.PlayOneShot(_powerupSoundClip);
-        _ammo = 15;
+        _ammo = 25;
         _uiManager.UpdateAmmo(_ammo);
     }
 

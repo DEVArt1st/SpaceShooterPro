@@ -192,6 +192,7 @@ public class MainFrame : MonoBehaviour
             _uiManager.RestartGameText();
             _uiManager.WinningText();
             _gameManager.GameWon();
+            _spawnManager.BossDefeated();
         }
     }
 

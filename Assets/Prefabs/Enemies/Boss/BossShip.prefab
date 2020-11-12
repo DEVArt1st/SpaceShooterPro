@@ -1464,7 +1464,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cf2c5d77a85df74c8110d78065da9cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _fireRate: 0.15
+  _fireRate: 0.13
   _redBulletPrefab: {fileID: 6684843817309613469, guid: 68fd7e8a7313b9044b26c24551bae87c,
     type: 3}
 --- !u!1 &6466927226517187013
@@ -1559,7 +1559,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cf2c5d77a85df74c8110d78065da9cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _fireRate: 0.15
+  _fireRate: 0.13
   _redBulletPrefab: {fileID: 6684843817309613469, guid: 68fd7e8a7313b9044b26c24551bae87c,
     type: 3}
 --- !u!1 &6466927226555258344
@@ -1916,7 +1916,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cf2c5d77a85df74c8110d78065da9cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _fireRate: 0.15
+  _fireRate: 0.13
   _redBulletPrefab: {fileID: 6684843817309613469, guid: 68fd7e8a7313b9044b26c24551bae87c,
     type: 3}
 --- !u!1 &6466927226769039239
@@ -2268,7 +2268,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2dc8ce60d2eaa524599a4a24bc1ef44e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _fireRate: 0.15
+  _fireRate: 0.2
   _mkLaserPrefab: {fileID: 5856653867096218144, guid: 99f004337b7414a44a2d522d6227f2f9,
     type: 3}
 --- !u!1 &6466927227035492709
@@ -2887,7 +2887,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2dc8ce60d2eaa524599a4a24bc1ef44e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _fireRate: 0.15
+  _fireRate: 0.2
   _mkLaserPrefab: {fileID: 5856653867096218144, guid: 99f004337b7414a44a2d522d6227f2f9,
     type: 3}
 --- !u!1 &6466927227204194870
@@ -3446,7 +3446,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2dc8ce60d2eaa524599a4a24bc1ef44e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _fireRate: 0.15
+  _fireRate: 0.2
   _mkLaserPrefab: {fileID: 5856653867096218144, guid: 99f004337b7414a44a2d522d6227f2f9,
     type: 3}
 --- !u!1 &6466927228019443664
@@ -3637,7 +3637,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2dc8ce60d2eaa524599a4a24bc1ef44e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _fireRate: 0.15
+  _fireRate: 0.2
   _mkLaserPrefab: {fileID: 5856653867096218144, guid: 99f004337b7414a44a2d522d6227f2f9,
     type: 3}
 --- !u!1 &8092347719802705340
