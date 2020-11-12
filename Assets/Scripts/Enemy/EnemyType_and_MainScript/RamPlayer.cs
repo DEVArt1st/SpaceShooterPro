@@ -7,22 +7,15 @@ public class RamPlayer : MonoBehaviour
     [SerializeField]
     private Transform _target;
     [SerializeField]
-    private Transform _parent;
-    [SerializeField]
     private bool _isPlayerSeen;
     [SerializeField]
-    private float _diffSpeed = 0.5f;
+    private float _diversionSpeed = 2f;
 
 
     private void Start()
     {
         _isPlayerSeen = false;
         _target = GameObject.Find("Player").transform;
-    }
-
-    private void Update()
-    {
-        DivertCourse();
     }
 
     private void OnTriggerStay2D(Collider2D other)
@@ -38,15 +31,20 @@ public class RamPlayer : MonoBehaviour
         if (other.gameObject.tag == "Player")
         {
             _isPlayerSeen = false;
-            _diffSpeed = 0f;
+            _diversionSpeed = 0f;
         }
     }
 
-    void DivertCourse()
+    public void DivertCourse(Transform pos)
     {
         if (_isPlayerSeen == true && _target != null)
         {
-            _parent.transform.position = Vector3.MoveTowards(_parent.transform.position, _target.transform.position, _diffSpeed);
+            pos.transform.position = Vector3.MoveTowards(pos.transform.position, _target.transform.position, _diversionSpeed * Time.deltaTime);
         }
+    }
+
+    public void DisableOnDestroyed()
+    {
+        this.gameObject.SetActive(false);
     }
 }

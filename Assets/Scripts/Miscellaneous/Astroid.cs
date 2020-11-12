@@ -39,12 +39,10 @@ public class Astroid : MonoBehaviour
     {
         if (other.tag == "Laser")
         {
-            _anim.SetTrigger("OnTargetHit");
             Instantiate(_explosionPrefab, transform.position, Quaternion.identity);
             _spawnManager.StartSpawning();
-            Destroy(this.gameObject, 3f);
+            Destroy(this.gameObject, 0.25f);
             Destroy(other.gameObject);
-            Destroy(this.gameObject.GetComponent<CircleCollider2D>());
         }
     }
 }

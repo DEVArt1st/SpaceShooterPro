@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 5088450121220642781}
   - component: {fileID: 5088450121220642779}
   - component: {fileID: 5088450121220642780}
-  - component: {fileID: 5088450121220642782}
   m_Layer: 0
   m_Name: Asteroid
   m_TagString: Untagged
@@ -134,23 +133,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 041961ba0c762204a83b16dac7690f82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _explosionPrefab: {fileID: 429784185191248139, guid: a3af153171a73f44888a5018c050b9d2,
+    type: 3}
   _rotationSpeed: 30
---- !u!95 &5088450121220642782
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2087736080770349783}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 49b5cc94cccb6a449ac373b5ae762cc4, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0

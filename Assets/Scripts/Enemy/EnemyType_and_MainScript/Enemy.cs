@@ -1,65 +1,55 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Net.Sockets;
-using UnityEditor;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
+    private enum EnemyType
+    {
+        LaserCannon,
+        LaserCannonShielded,
+        TimeBombDeployer,
+        TimeBombDeployerShielded,
+        Agressive
+    }
+
+    [SerializeField]
+    private EnemyType _enemyType;
+
     [SerializeField]
     private float _speed = 4.0f;
-    private float _canFire = 1f;
-    private float _fireRate = 3f;
-    private float _mineDeploymentRate = 3f;
-    private float _canDeployMine = 1f;
-    [SerializeField]
-    private int _shieldLife;
-    [SerializeField]
-    private float _diffSpeed = 0.5f;
-    [SerializeField]
-    private GameObject _laserPrefab;
-    [SerializeField]
-    private GameObject _mine;
-    [SerializeField]
-    private GameObject _shieldVisualizer;
-    [SerializeField]
-    private GameObject _courseDiverter;
-
     private Player _player;
     private Animator _anim;
+    private ShieldedEnemy _shieldedEnemy;
+    private EnemyTimeBomber _enemyTimeBomber;
+    private EnemyLaserCannon _enemyLaserCannon;
+    private EnemyAggressive _enemyAggressive;
 
     [SerializeField]
     private AudioClip _explosionSoundClip;
     private AudioSource _audioSource;
 
-    private bool _isShootingActive = true;
-    private bool _isShieldActive = false;
-    private bool _isMineGenerating;
-
     [SerializeField]
-    private int _enemyID;
-    
+    private bool _isShieldActive = false;
+
+
     private float _rotateSpeed = 0.5f;
 
-
-
-    // Start is called before the first frame update
     void Start()
     {
         _player = GameObject.Find("Player").GetComponent<Player>();
+        _anim = GetComponent<Animator>();
         _audioSource = GetComponent<AudioSource>();
-        
+        _shieldedEnemy = GetComponentInParent<ShieldedEnemy>();
+        _enemyTimeBomber = GetComponentInParent<EnemyTimeBomber>();
+        _enemyLaserCannon = GetComponentInParent<EnemyLaserCannon>();
+        _enemyAggressive = GetComponentInChildren<EnemyAggressive>();
+
+        _isShieldActive = true;
+
         if (_player == null)
         {
             Debug.LogError("Player is Null");
-        }
-
-        //assign the componet to Anim
-        _anim = GetComponent<Animator>();
-
-        if (_anim == null)
-        {
-            Debug.LogError("Animator is NULL");
         }
 
         if (_audioSource == null)
@@ -68,25 +58,11 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
     void Update()
     {
         CalculateMovement();
 
-        if (Time.time > _canFire)
-        {
-            EnemyLaserFire();
-        }
-
-        if (Time.time > _canDeployMine)
-        {
-            EnemyMineDeployer();
-        }
-    }
-
-    private void Awake()
-    {
-        EnemyType();
+        SwitchEnemyType();
     }
 
     void CalculateMovement()
@@ -129,15 +105,23 @@ public class Enemy : MonoBehaviour
 
             if (_isShieldActive == true)
             {
-                _shieldLife--;
+                _shieldedEnemy.Shield();
+                _isShieldActive = false;
+            }
 
-                if (_shieldLife <= 0)
-                {
-                    _shieldVisualizer.SetActive(false);
-                    _isShieldActive = false;
-                }
+            if (_enemyType == EnemyType.Agressive)
+            {
+                _enemyAggressive.Disable();
+            }
 
-                return;
+            if (_enemyType == EnemyType.LaserCannon || _enemyType == EnemyType.TimeBombDeployerShielded)
+            {
+                _enemyLaserCannon.StopFiring();
+            }
+
+            if (_enemyType == EnemyType.TimeBombDeployer || _enemyType == EnemyType.LaserCannonShielded)
+            {
+                _enemyTimeBomber.StopDeployment();
             }
 
             _anim.SetTrigger("OnEnemyDeath");
@@ -146,115 +130,79 @@ public class Enemy : MonoBehaviour
             Destroy(this.gameObject, 2.8f);
             Destroy(GetComponent<Collider2D>());
             Destroy(GetComponent<Rigidbody2D>());
-            _isShootingActive = false;
-            _courseDiverter.SetActive(false);
+
         }
     }
-
-
 
     public void Damage()
     {
         if (_isShieldActive == true)
         {
-            _shieldLife--;
-
-            if (_shieldLife <= 0)
-            {
-                _shieldVisualizer.SetActive(false);
-                _isShieldActive = false;
-            }
+            _shieldedEnemy.Shield();
+            _isShieldActive = false;
 
             return;
         }
+
         _anim.SetTrigger("OnEnemyDeath");
         _audioSource.Play();
         _speed = 0;
         Destroy(this.gameObject, 2.8f);
-
-
 
         if (_player != null)
         {
             _player.AddScore(10);
         }
 
+        if (_enemyType == EnemyType.Agressive)
+        {
+            _enemyAggressive.Disable();
+        }
+
+        if (_enemyType == EnemyType.LaserCannon || _enemyType == EnemyType.LaserCannonShielded)
+        {
+            _enemyLaserCannon.StopFiring();
+        }
+
+        if (_enemyType == EnemyType.TimeBombDeployer || _enemyType == EnemyType.TimeBombDeployerShielded)
+        {
+            _enemyTimeBomber.StopDeployment();
+        }
+
         Destroy(GetComponent<Collider2D>());
         Destroy(GetComponent<Rigidbody2D>());
-        _isShootingActive = false;
-        //_courseDiverter.SetActive(false);
-
     }
 
-    public void EnemyLaserFire()
+    public void DodgeRight()
     {
-        _fireRate = Random.Range(3f, 7f);
-        _canFire = Time.time + _fireRate;
+        transform.Translate(Vector3.right * _speed * Time.deltaTime);
+    }
 
-        if (_isShootingActive == true)
+    public void DodgeLeft()
+    {
+        transform.Translate(Vector3.left * _speed * Time.deltaTime);
+    }
+
+    private void SwitchEnemyType()
+    {
+        switch (_enemyType)
         {
-
-            GameObject enemyLaser = Instantiate(_laserPrefab, transform.position, Quaternion.identity);
-            Laser[] lasers = enemyLaser.gameObject.GetComponentsInChildren<Laser>();
-
-            for (int i = 0; i < lasers.Length; i++)
-            {
-                lasers[i].AssignEnemyLaser();
-            }
-        }
-    }
-
-
-    void EnemyMineDeployer()
-    {
-        _mineDeploymentRate = Random.Range(3f, 7f);
-        _canDeployMine = Time.time + _fireRate;
-
-        _isShootingActive = false;
-        StartCoroutine(MineDeployer());
-    }
-
-    IEnumerator MineDeployer()
-    {
-        if (!_isMineGenerating)
-        {
-            yield return new WaitForSeconds(1f);
-            _isMineGenerating = true;
-            Instantiate(_mine, transform.position + new Vector3(0, 0, 0), Quaternion.identity);
-            yield return new WaitForSeconds(3.0f);
-            _isMineGenerating = false;
-        }
-    }
-
-    void AggressiveEnemy()
-    {
-        _isShootingActive = false;
-    }
-
-    void EnemyType()
-    {
-        switch (_enemyID)
-        {
-            case 0:
-                EnemyLaserFire();
+            case EnemyType.LaserCannon:
+                _enemyLaserCannon.FireLaser();
+                _isShieldActive = false;
                 break;
-            case 1:
-                EnemyMineDeployer();
+            case EnemyType.TimeBombDeployer:
+                _enemyTimeBomber.DeployBomb();
+                _isShieldActive = false;
                 break;
-            case 2:
-                EnemyMineDeployer();
-                _isShieldActive = true;
-                _shieldVisualizer.SetActive(true);
+            case EnemyType.TimeBombDeployerShielded:
+                _enemyTimeBomber.DeployBomb();
                 break;
-            case 3:
-                EnemyLaserFire();
-                _isShieldActive = true;
-                _shieldVisualizer.SetActive(true);
+            case EnemyType.LaserCannonShielded:
+                _enemyLaserCannon.FireLaser();
                 break;
-            case 4:
-                AggressiveEnemy();
-                _isShieldActive = true;
-                _shieldVisualizer.SetActive(true);
+            case EnemyType.Agressive:
+                _enemyAggressive.RamPlayer();
                 break;
             default:
                 Debug.Log("Default Value");

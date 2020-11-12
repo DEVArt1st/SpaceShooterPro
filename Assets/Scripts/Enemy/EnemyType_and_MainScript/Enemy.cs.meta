@@ -3,7 +3,12 @@ guid: a50f3c835c576f24d871abf128bbf575
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - _laserPrefab: {instanceID: 0}
+  - _timeBomb: {instanceID: 0}
+  - _shieldVisualizer: {instanceID: 0}
+  - _courseDiverter: {instanceID: 0}
+  - _explosionSoundClip: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

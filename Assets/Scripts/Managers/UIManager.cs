@@ -15,6 +15,14 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private Text _restartGameText;
     [SerializeField]
+    private Text _gameEndText;
+    [SerializeField]
+    private Text _winnerText;
+    [SerializeField]
+    private Button _restartButton;
+    [SerializeField]
+    private Button _mainMenuButton;
+    [SerializeField]
     private Image _livesImg;
     [SerializeField]
     private Sprite[] _liveSprites;
@@ -55,7 +63,6 @@ public class UIManager : MonoBehaviour
 
     public void GameOverTextFlicker()
     {
-        //call loop text
         StartCoroutine(FlickerTextRoutine());
     }
 
@@ -68,6 +75,18 @@ public class UIManager : MonoBehaviour
             _gameoverText.gameObject.SetActive(false);
             yield return new WaitForSeconds(0.5f);
         }
+    }
+
+    public void ButtonActivation()
+    {
+        _restartButton.gameObject.SetActive(true);
+        _mainMenuButton.gameObject.SetActive(true);
+    }
+
+    public void WinningText()
+    {
+        _winnerText.gameObject.SetActive(true);
+        _gameEndText.gameObject.SetActive(true);
     }
 
     public void RestartGameText()
@@ -105,9 +124,9 @@ public class UIManager : MonoBehaviour
     {
         while (_thrustBar.fillAmount <= 0.25f)
         {
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.15f);
             _thrustBar.color = Color.red;
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.15f);
             _thrustBar.color = Color.white;
         }
     }

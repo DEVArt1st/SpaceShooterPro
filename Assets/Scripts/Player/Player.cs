@@ -33,6 +33,7 @@ public class Player : MonoBehaviour
     private bool _isMissleActive = false;
     private bool _laserFire = true;
     private bool _isThrustActive = false;
+    private bool _isControlActive = false;
 
     [SerializeField]
     private int _score;
@@ -63,6 +64,7 @@ public class Player : MonoBehaviour
         _audioSource = GetComponent<AudioSource>();
         _camera = GameObject.Find("Main Camera").GetComponent<CameraShake>();
 
+        _isControlActive = true;
         _currentThrust = _maxThrust;
 
         if (_spawnManager == null)
@@ -103,29 +105,30 @@ public class Player : MonoBehaviour
 
     void CalcualteMovement()
     {
-        float horizontalInput = Input.GetAxis("Horizontal");
-        float verticalInput = Input.GetAxis("Vertical");
-
-        Vector3 direction = new Vector3(horizontalInput, verticalInput, 0);
-
-
-        transform.Translate(direction * _speed * Time.deltaTime);
-
-
-
-        transform.position = new Vector3(transform.position.x, Mathf.Clamp(transform.position.y, -3.8f, 0));
-
-        if (transform.position.x >= 11.3f)
+        if (_isControlActive == true)
         {
-            transform.position = new Vector3(-11.3f, transform.position.y, 0);
-        }
-        else if (transform.position.x <= -11.3f)
-        {
-            transform.position = new Vector3(11.3f, transform.position.y, 0);
-        }
+            float horizontalInput = Input.GetAxis("Horizontal");
+            float verticalInput = Input.GetAxis("Vertical");
 
-        SpeedBooster();
+            Vector3 direction = new Vector3(horizontalInput, verticalInput, 0);
 
+
+            transform.Translate(direction * _speed * Time.deltaTime);
+
+            transform.position = new Vector3(transform.position.x, Mathf.Clamp(transform.position.y, -3.8f, 0));
+
+            if (transform.position.x >= 11.3f)
+            {
+                transform.position = new Vector3(-11.3f, transform.position.y, 0);
+            }
+            else if (transform.position.x <= -11.3f)
+            {
+                transform.position = new Vector3(11.3f, transform.position.y, 0);
+            }
+
+            SpeedBooster();
+
+        }
     }
 
     void FireLaser()
@@ -209,6 +212,7 @@ public class Player : MonoBehaviour
             Destroy(GetComponent<BoxCollider2D>());
             _uiManager.GameOverTextFlicker();
             _uiManager.RestartGameText();
+            _uiManager.ButtonActivation();
         }
 
     }
@@ -358,6 +362,17 @@ public class Player : MonoBehaviour
         {
             _currentThrust = 50;
             _uiManager.UpdateThruster(_currentThrust);
+        }
+    }
+
+    public void GameWonFlyAway()
+    {
+        transform.Translate(Vector3.up * 10f * Time.deltaTime);
+        _isControlActive = false;
+
+        if (transform.position.y >= 12)
+        {
+            Destroy(this.gameObject);
         }
     }
 }

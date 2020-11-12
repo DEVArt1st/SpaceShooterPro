@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Security.Cryptography;
 using UnityEngine;
 
 public class Laser : MonoBehaviour
@@ -73,7 +72,7 @@ public class Laser : MonoBehaviour
             Destroy(this.gameObject);
         }
 
-        if (other.tag == "Enemy" && _isEnemyLaser == false)
+        if (other.CompareTag("Enemy") && _isEnemyLaser == false)
         {
             Enemy enemy = other.GetComponent<Enemy>();
 
@@ -82,7 +81,7 @@ public class Laser : MonoBehaviour
                 enemy.Damage();
             }
 
-            Destroy(this.gameObject);
+            Destroy(gameObject);
         }
 
         if (other.tag == "Powerup" && _isEnemyLaser == true)
@@ -91,114 +90,98 @@ public class Laser : MonoBehaviour
             Destroy(other.gameObject);
         }
 
-        if (other.tag == "SpaceshipTurrentCenter")
+        if (other.CompareTag("MKOneTurret"))
         {
-            BossTurrent bossTurrent = other.GetComponent<BossTurrent>();
+            MKOneTurret mkOneTurret = other.GetComponent<MKOneTurret>();
 
-            if (bossTurrent != null)
+            if (mkOneTurret != null)
             {
-                bossTurrent.Damage();
+                mkOneTurret.Damage(5);
             }
+
             Destroy(this.gameObject);
         }
 
-        if (other.tag == "SpaceshipTurrentRight")
+        if (other.CompareTag("MKFourTurret"))
         {
-            BossTurrent bossTurrent = other.GetComponent<BossTurrent>();
+            MKFourTurret mkFourTurret = other.GetComponent<MKFourTurret>();
 
-            if (bossTurrent != null)
+            if (mkFourTurret != null)
             {
-                bossTurrent.Damage();
+                mkFourTurret.Damage(3);
             }
+
             Destroy(this.gameObject);
         }
 
-        if (other.tag == "SpaceshipTurrentLeft")
+        if (other.CompareTag("MainGunTurret"))
         {
-            BossTurrent bossTurrent = other.GetComponent<BossTurrent>();
+            MainGunTurret mainGunTurret = other.GetComponent<MainGunTurret>();
 
-            if (bossTurrent != null)
+            if (mainGunTurret != null)
             {
-                bossTurrent.Damage();
+                mainGunTurret.Damage(2);
             }
+
             Destroy(this.gameObject);
         }
 
-        if (other.tag == "MK1LeftOne")
-        {
-            TurrentMKOne turrentMKOne = other.GetComponent<TurrentMKOne>();
-
-            if (turrentMKOne != null)
-            {
-                turrentMKOne.Damage();
-            }
-            Destroy(this.gameObject);
-        }
-
-        if (other.tag  == "MK1LeftTwo")
-        {
-            TurrentMKOne turrentMKOne = other.GetComponent<TurrentMKOne>();
-
-            if (turrentMKOne != null)
-            {
-                turrentMKOne.Damage();
-            }
-            Destroy(this.gameObject);
-        }
-
-        if (other.tag == "MK1RightTwo")
-        {
-            TurrentMKOne turrentMKOne = other.GetComponent<TurrentMKOne>();
-
-            if (turrentMKOne != null)
-            {
-                turrentMKOne.Damage();
-            }
-            Destroy(this.gameObject);
-        }
-
-        if (other.tag == "MK1RightOne")
-        {
-            TurrentMKOne turrentMKOne = other.GetComponent<TurrentMKOne>();
-
-            if (turrentMKOne != null)
-            {
-                turrentMKOne.Damage();
-            }
-            Destroy(this.gameObject);
-        }
-
-        if (other.tag == "MK4Left")
-        {
-            TurrentMKFour turrentMKFour = other.GetComponent<TurrentMKFour>();
-
-            if (turrentMKFour != null)
-            {
-                turrentMKFour.Damage();
-            }
-            Destroy(this.gameObject);
-        }
-
-        if (other.tag == "MK4Right")
-        {
-            TurrentMKFour turrentMKFour = other.GetComponent<TurrentMKFour>();
-
-            if (turrentMKFour != null)
-            {
-                turrentMKFour.Damage();
-            }
-            Destroy(this.gameObject);
-        }
-
-        if (other.tag == "BossShipMainFrame")
+        if (other.CompareTag("BossShipMainFrame"))
         {
             MainFrame mainFrame = other.GetComponent<MainFrame>();
 
             if (mainFrame != null)
             {
-                mainFrame.Damage();
+                mainFrame.Damage(5);
             }
+
             Destroy(this.gameObject);
+        }
+    }
+
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        if (other.CompareTag("RightDetector") && _isEnemyLaser == false)
+        {
+            Dodge dodge = other.GetComponent<Dodge>();
+
+            if (dodge != null)
+            {
+                dodge.PlayerLaserInSight(true);
+            }
+        }
+
+        if (other.CompareTag("LeftDetector") && _isEnemyLaser == false)
+        {
+            Dodge dodge = other.GetComponent<Dodge>();
+
+            if (dodge != null)
+            {
+                dodge.PlayerLaserInSight(true);
+            }
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.CompareTag("RightDetector") && _isEnemyLaser == false)
+        {
+            Dodge dodge = other.GetComponent<Dodge>();
+
+            if (dodge != null)
+            {
+                dodge.PlayerLaserInSight(false);
+            }
+        }
+
+        if (other.CompareTag("LeftDetector") && _isEnemyLaser == false)
+        {
+            Dodge dodge = other.GetComponent<Dodge>();
+
+            if (dodge != null)
+            {
+                dodge.PlayerLaserInSight(false);
+            }
         }
     }
 }

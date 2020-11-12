@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Net.Sockets;
 using UnityEngine;
 
 public class SpawnManager : MonoBehaviour
@@ -37,11 +36,12 @@ public class SpawnManager : MonoBehaviour
         StartCoroutine(SpawnPowerupEpicRoutine());
         StartCoroutine(SpawnPowerupRareRoutine());
         StartCoroutine(CountDownForNextEnemyType());
+        _wave = 1;
     }
 
     private void Update()
     {
-        if (_bossHasSpawn == false && _wave == 10)
+        if (_bossHasSpawn == false && _wave >= 10)
         {
             StartCoroutine(SpawnBossRoutine());
 
@@ -71,7 +71,7 @@ public class SpawnManager : MonoBehaviour
     IEnumerator SpawnBossRoutine()
     {
 
-        if (_wave == 10)
+        if (_wave >= 10)
         {
             SpawnBoss();
         }
@@ -80,7 +80,7 @@ public class SpawnManager : MonoBehaviour
 
     void SpawnBoss()
     {
-        if (_wave == 10)
+        if (_wave >= 10)
         {
             Instantiate(_bossPrefab, new Vector3(-0.2f, 11, 0), Quaternion.Euler(0, 0, -180));
         }
@@ -135,17 +135,15 @@ public class SpawnManager : MonoBehaviour
     {
         yield return new WaitForSeconds(6.0f);
 
-        while (_stopSpawning == false || _wave == 10)
+        while (_stopSpawning == false || _wave >= 10)
         {
-            Debug.Log("Spawn Powerups Common");
-
             Vector3 posToSpawnPowerup = new Vector3(Random.Range(-8f, 8f), 7, 0);
             int randomPowerUp = Random.Range(0, _commonPowerUps.Length);
             Instantiate(_commonPowerUps[randomPowerUp], posToSpawnPowerup, Quaternion.identity);
             yield return new WaitForSeconds(Random.Range(6, 10));
         }
 
-        while (_wave == 10)
+        while (_wave >= 10)
         {
             Vector3 posToSpawnPowerup = new Vector3(Random.Range(-8f, 8f), 7, 0);
             int randomPowerUp = Random.Range(0, _commonPowerUps.Length);
@@ -158,7 +156,7 @@ public class SpawnManager : MonoBehaviour
     {
         yield return new WaitForSeconds(35.0f);
 
-        while (_stopSpawning == false || _wave == 10)
+        while (_stopSpawning == false || _wave >= 10)
         {
             Vector3 posToSpawnPowerup = new Vector3(Random.Range(-8f, 8f), 7, 0);
             int randomPowerUp = Random.Range(0, _rarePowerUps.Length);
@@ -170,7 +168,7 @@ public class SpawnManager : MonoBehaviour
     IEnumerator SpawnPowerupEpicRoutine()
     {
         yield return new WaitForSeconds(60.0f);
-        while (_stopSpawning == false || _wave == 10)
+        while (_stopSpawning == false || _wave >= 10)
         {
             Vector3 posToSpawnPowerup = new Vector3(Random.Range(-8f, 8f), 7, 0);
             int randomRarePowerUp = Random.Range(0, _epicPowerUps.Length);

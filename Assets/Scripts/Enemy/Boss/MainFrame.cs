@@ -1,71 +1,77 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Sockets;
+﻿using System.Collections;
 using UnityEngine;
 
 public class MainFrame : MonoBehaviour
 {
     [SerializeField]
-    private GameObject[] _turrents;
+    private int _health = 20;
+    [SerializeField]
+    private float _speed = 1;
 
-    [HideInInspector]
-    public int _health = 10;
+    private bool _isExploding;
+    private bool _isBossDead;
 
-    public float _speed = 1;
-
-    [SerializeField]
-    private GameObject[] _turrentFireBig;
-    [SerializeField]
-    private GameObject[] _turrentFireMKOne;
-    [SerializeField]
-    private GameObject[] _turrentFireMKFour;
-
-    [SerializeField]
-    private GameObject[] _turrentBig;
-    [SerializeField]
-    private GameObject[] _turrentMKOne;
-    [SerializeField]
-    private GameObject[] _turrentMKFour;
-
+    //Shown in Inspector
     [SerializeField]
     private GameObject _explosionPrefab;
+    [SerializeField]
+    private GameObject _finalExplosionPrefab;
+    [SerializeField]
+    private GameObject _shipFireOne;
+    [SerializeField]
+    private GameObject _shipFireTwo;
+    [SerializeField]
+    private GameObject _shipFireThree;
+    [SerializeField]
+    private GameObject _shipFireFour;
 
-    [SerializeField]
-    private GameObject _leftThrust;
-    [SerializeField]
-    private GameObject _rightThrust;
+    //Hidden from Inspector
+    private GameObject[] _thrusters;
+    private GameObject[] _mkOneTurrets;
+    private GameObject[] _mkFourTurrets;
+    private GameObject[] _mainGunTurrets;
 
     private Animator _anim;
     private SpawnManager _spawnManager;
+    private BoxCollider2D _boxCollider;
     private UIManager _uiManager;
-    private Player _player;
-
-    [HideInInspector]
-    public bool bossDefeated = false;
+    private GameManager _gameManager;
+   
 
     private void Start()
     {
         _anim = GetComponent<Animator>();
-
+        _boxCollider = GetComponent<BoxCollider2D>();
+        _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
+        _gameManager = GameObject.Find("Game_Manager").GetComponent<GameManager>();
         _spawnManager = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>();
 
         if (_spawnManager == null)
         {
             Debug.LogError("The Spawn Manager is NULL");
         }
+
+        if (_uiManager == null)
+        {
+            Debug.LogError("The UIManager is NULL");
+        }
+
+        if (_gameManager == null)
+        {
+            Debug.LogError("GameManager is NULL");
+        }
     }
 
     private void Update()
     {
-        if (_turrents[0] == null && _turrents[1] == null && _turrents[2] == null && _turrents[3] == null && _turrents[4] == null && _turrents[5] == null && _turrents[6] == null && _turrents[7] == null && _turrents[8] == null)
-        {
-            gameObject.GetComponent<PolygonCollider2D>().enabled = true;
-        }
+        _thrusters = GameObject.FindGameObjectsWithTag("BossShipThrusters");
+        _mkOneTurrets = GameObject.FindGameObjectsWithTag("MKOneTurret");
+        _mkFourTurrets = GameObject.FindGameObjectsWithTag("MKFourTurret");
+        _mainGunTurrets = GameObject.FindGameObjectsWithTag("MainGunTurret");
 
         MoveDown();
         Stop();
+        ActivateCollider();
     }
 
     public void Damage()
@@ -78,8 +84,6 @@ public class MainFrame : MonoBehaviour
             _anim.SetTrigger("OnTargetHit");
             Instantiate(_explosionPrefab, transform.position, Quaternion.identity);
 
-            _leftThrust.SetActive(false);
-            _rightThrust.SetActive(false);
             Destroy(gameObject.GetComponent<PolygonCollider2D>());
             Destroy(gameObject.GetComponent<Rigidbody2D>());
             _spawnManager.OnBossDestroyed();
@@ -91,45 +95,108 @@ public class MainFrame : MonoBehaviour
         transform.Translate(Vector3.up * _speed * Time.deltaTime);
     }
 
-    public void Stop()
+    void Stop()
     {
         if (transform.position.y <= 5)
         {
             _speed = 0;
 
-            //Player Spoter
-            for (var i = 0; i < _turrentFireBig.Length; i++)
+            foreach (var thrusters in _thrusters)
             {
-                _turrentFireBig[i].SetActive(true);
+                thrusters.gameObject.SetActive(false);
             }
 
-            for (var i = 0; i < _turrentFireMKOne.Length; i++)
+            foreach (var mkOneTurret in _mkOneTurrets)
             {
-                _turrentFireMKOne[i].SetActive(true);
+                if (mkOneTurret != null)
+                {
+                    mkOneTurret.gameObject.GetComponent<BoxCollider2D>().enabled = true;
+                    mkOneTurret.gameObject.GetComponentInChildren<MKOneTurrentFire>().gameObject.GetComponent<BoxCollider2D>().enabled = true;
+                }
             }
 
-            for (var i = 0; i < _turrentFireMKFour.Length; i++)
+            foreach (var mkFourTurret in _mkFourTurrets)
             {
-                _turrentFireMKFour[i].SetActive(true);
+                if (mkFourTurret != null)
+                {
+                    mkFourTurret.gameObject.GetComponent<BoxCollider2D>().enabled = true;
+                    mkFourTurret.gameObject.GetComponentInChildren<MKFourTurrentFire>().gameObject.GetComponent<BoxCollider2D>().enabled = true;
+                }
             }
 
-
-
-            //Turrent Colliders
-            for (var i = 0; i < _turrentBig.Length; i++)
+            foreach (var mainGunTurret in _mainGunTurrets)
             {
-                _turrentBig[i].GetComponent<PolygonCollider2D>().enabled = true;
-            }
-
-            for (var i = 0; i < _turrentMKOne.Length; i++)
-            {
-                _turrentMKOne[i].GetComponent<PolygonCollider2D>().enabled = true;
-            }
-
-            for (var i = 0; i < _turrentMKFour.Length; i++)
-            {
-                _turrentMKFour[i].GetComponent<PolygonCollider2D>().enabled = true;
+                if (mainGunTurret != null)
+                {
+                    mainGunTurret.gameObject.GetComponent<BoxCollider2D>().enabled = true;
+                    mainGunTurret.gameObject.GetComponentInChildren<MainGunFire>().gameObject.GetComponent<BoxCollider2D>().enabled = true;
+                }
             }
         }
+    }
+
+    private void ActivateCollider()
+    {
+        if (_mkOneTurrets.Length == 0 && _mkFourTurrets.Length == 0 & _mainGunTurrets.Length == 0)
+        {
+            if (_boxCollider != null)
+            {
+                _boxCollider.enabled = true;
+            }
+        }
+    }
+
+    public void Damage(int amount)
+    {
+        _health -= amount;
+
+        if (_health <= 0 && _boxCollider == true)
+        {
+            _isExploding = true;
+            _health = 0;
+            Destroy(this._boxCollider);
+            StartCoroutine(Exploding());
+        }
+    }
+
+    IEnumerator Exploding()
+    {
+        float timeToWait = 1.0f;
+        float shipFireActiveTime = 0.5f;
+
+        while (_isExploding == true)
+        {
+            Instantiate(_explosionPrefab, transform.position + Position(-6.5f, -1.5f, 0f), Quaternion.identity);
+            yield return new WaitForSeconds(shipFireActiveTime);
+            _shipFireOne.SetActive(true);
+            yield return new WaitForSeconds(timeToWait);
+            Instantiate(_explosionPrefab, transform.position + Position(2.8f, 0.5f, 0f), Quaternion.identity);
+            yield return new WaitForSeconds(shipFireActiveTime);
+            _shipFireTwo.SetActive(true);
+            yield return new WaitForSeconds(timeToWait);
+            Instantiate(_explosionPrefab, transform.position + Position(-2.6f, 0.1f, 0f), Quaternion.identity);
+            yield return new WaitForSeconds(shipFireActiveTime);
+            _shipFireThree.SetActive(true);
+            yield return new WaitForSeconds(timeToWait);
+            Instantiate(_explosionPrefab, transform.position + Position(6.6f, -1.52f, 0f), Quaternion.identity);
+            yield return new WaitForSeconds(shipFireActiveTime);
+            _shipFireFour.SetActive(true);
+            yield return new WaitForSeconds(2f);
+            Destroy(this.gameObject, 0.25f);
+            Instantiate(_finalExplosionPrefab, transform.position, Quaternion.identity);
+            Instantiate(_finalExplosionPrefab, transform.position + Position(-4.9f, -1f, 0f), Quaternion.identity);
+            Instantiate(_finalExplosionPrefab, transform.position + Position(4.6f, -1f, 0f), Quaternion.identity);
+
+            _isExploding = false;
+            _uiManager.ButtonActivation();
+            _uiManager.RestartGameText();
+            _uiManager.WinningText();
+            _gameManager.GameWon();
+        }
+    }
+
+    Vector3 Position(float x, float y, float z)
+    {
+        return new Vector3(x, y, z);
     }
 }
